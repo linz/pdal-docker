@@ -1,0 +1,56 @@
+version: 2
+updates:
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: daily
+    cooldown:
+      default-days: 15
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: 'build(deps)'
+    groups:
+      # Minor and patch land together; a base-image major gets its own PR.
+      docker-minor-and-patch:
+        patterns: ['*']
+        update-types: ['minor', 'patch']
+  # The actionlint image is pinned in a Dockerfile so Dependabot can update it.
+  - package-ecosystem: docker
+    directory: /.github/workflows
+    schedule:
+      interval: daily
+    cooldown:
+      default-days: 15
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: 'build(deps)'
+    groups:
+      workflow-docker-minor-and-patch:
+        patterns: ['*']
+        update-types: ['minor', 'patch']
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: daily
+    cooldown:
+      default-days: 15
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: 'build(deps)'
+    groups:
+      actions-minor-and-patch:
+        patterns: ['*']
+        update-types: ['minor', 'patch']
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: daily
+    cooldown:
+      default-days: 15
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: 'build(deps)'
+    groups:
+      npm-minor-and-patch:
+        patterns: ['*']
+        update-types: ['minor', 'patch']
