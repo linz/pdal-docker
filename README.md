@@ -14,8 +14,8 @@ The image contains `pdal`, its shared libraries and `python3`. Layer your own en
 
 ## Publishing
 
-Every push to `master` builds the image, checks that `pdal --version` matches the recipe, and publishes two tags: `<pdal version>` and `<pdal version>-<short sha>`. 
-The second (`<pdal version>-<short sha>`) distinguishes rebuilds that do not change the PDAL version. 
+Every push to `master` builds the image, checks that `pdal --version` matches the recipe, and publishes two tags: `<pdal version>` and `<pdal version>-<short sha>`.
+The second (`<pdal version>-<short sha>`) distinguishes rebuilds that do not change the PDAL version.
 
 Pull requests build and verify without publishing.
 

@@ -1,0 +1,17 @@
+{
+  "name": "@linzjs/pdal-docker",
+  "version": "1.0.0",
+  "private": true,
+  "repository": "git@github.com:linz/pdal-docker.git",
+  "license": "MIT",
+  "scripts": {
+    "lint": "oxfmt . --write",
+    "check": "oxfmt . --check"
+  },
+  "engines": {
+    "node": "^24.5.0"
+  },
+  "devDependencies": {
+    "oxfmt": "^0.67.0"
+  }
+}
