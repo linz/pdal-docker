@@ -4,7 +4,7 @@
 ARG PDAL_VERSION=2.10.2
 ARG PDAL_COMMIT=27008f6241be44585c866a29dfc13bb16d678dab
 
-FROM ubuntu:24.04@sha256:33ceb71981b602c1a7443a53469e4dba065f7503eab3078a2d7a57a2ab987517 AS builder
+FROM ubuntu:25.10@sha256:7cc5e35f6567ee8c66d2abb4aab0fd866669e6207c237c3a8f0947a5c7f17092 AS builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
@@ -39,7 +39,7 @@ RUN cmake -S /usr/src/pdal -B /usr/src/pdal/build \
 RUN cmake --build /usr/src/pdal/build --parallel "$(nproc)"
 RUN cmake --install /usr/src/pdal/build
 
-FROM ubuntu:24.04@sha256:33ceb71981b602c1a7443a53469e4dba065f7503eab3078a2d7a57a2ab987517
+FROM ubuntu:25.10@sha256:7cc5e35f6567ee8c66d2abb4aab0fd866669e6207c237c3a8f0947a5c7f17092
 
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
