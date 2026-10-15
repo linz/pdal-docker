@@ -2,6 +2,10 @@ version: 2
 updates:
   - package-ecosystem: docker
     directory: /
+    ignore:
+      # Track Ubuntu LTS only; interim releases are supported for 9 months.
+      - dependency-name: ubuntu
+        versions: ['24.10', '25.04', '25.10', '26.10', '27.04', '27.10']
     schedule:
       interval: daily
     cooldown:
