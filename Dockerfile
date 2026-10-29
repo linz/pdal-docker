@@ -4,7 +4,7 @@
 ARG PDAL_VERSION=2.10.2
 ARG PDAL_COMMIT=27008f6241be44585c866a29dfc13bb16d678dab
 
-FROM ubuntu:24.04@sha256:33ceb71981b602c1a7443a53469e4dba065f7503eab3078a2d7a57a2ab987517 AS builder
+FROM ubuntu:26.04@sha256:0e73b71479e7bc5f006bca872e25c3cd680dc052a0116f90d63ae363537db0dd AS builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
@@ -39,7 +39,7 @@ RUN cmake -S /usr/src/pdal -B /usr/src/pdal/build \
 RUN cmake --build /usr/src/pdal/build --parallel "$(nproc)"
 RUN cmake --install /usr/src/pdal/build
 
-FROM ubuntu:24.04@sha256:33ceb71981b602c1a7443a53469e4dba065f7503eab3078a2d7a57a2ab987517
+FROM ubuntu:26.04@sha256:0e73b71479e7bc5f006bca872e25c3cd680dc052a0116f90d63ae363537db0dd
 
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
@@ -47,7 +47,7 @@ ENV TZ=Etc/UTC
 RUN apt-get update \
     && apt-get install --assume-yes --no-install-recommends \
         ca-certificates \
-        libgdal34t64 \
+        libgdal38 \
         python3 \
     && rm -rf /var/lib/apt/lists/*
 
