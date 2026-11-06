@@ -1,0 +1,72 @@
+name: Update pixi.lock
+
+# Dependabot can't update pixi.lock, so this opens a weekly pull request instead.
+# exclude-newer in pixi.toml sets the minimum package age.
+# Only verified actions are allowed, so pixi and the pull request are handled with plain commands.
+on:
+  schedule:
+    # Mondays alongside Dependabot: 07:30 NZDT, 06:30 NZST (cron is UTC)
+    - cron: '30 18 * * 0'
+  workflow_dispatch:
+
+permissions: {}
+
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # From the pixi image the Dockerfile builds with, so Dependabot's updates to it apply here too
+      - name: Install pixi
+        run: |
+          image=$(awk '$1 == "FROM" && $2 ~ /^ghcr\.io\/prefix-dev\/pixi:/ { print $2; exit }' Dockerfile)
+          [[ -n "${image}" ]] || { echo "::error::no ghcr.io/prefix-dev/pixi image in Dockerfile"; exit 1; }
+          container=$(docker create "${image}")
+          mkdir -p "${RUNNER_TEMP}/pixi"
+          docker cp "${container}:/usr/local/bin/pixi" "${RUNNER_TEMP}/pixi/pixi"
+          docker rm "${container}" > /dev/null
+          echo "${RUNNER_TEMP}/pixi" >> "${GITHUB_PATH}"
+
+      - name: Update pixi.lock
+        run: |
+          pixi update --json | pixi exec --spec pixi-diff-to-markdown==0.3.11 pixi-diff-to-markdown > "${RUNNER_TEMP}/diff.md"
+
+      - name: Open, update or close the pull request
+        env:
+          GH_TOKEN: ${{ secrets.LINZ_GITHUB_AUTOMATION }}
+          GH_REPO: ${{ github.repository }}
+          BRANCH: pixi/update-lockfile
+          TITLE: 'build(deps): update pixi.lock'
+        run: |
+          open_pr=$(gh pr list --head "${BRANCH}" --state open --json number --jq '.[0].number // empty')
+
+          if git diff --quiet -- pixi.lock; then
+            echo "pixi.lock is up to date"
+            if [[ -n "${open_pr}" ]]; then
+              gh pr close "${open_pr}" --delete-branch --comment "pixi.lock is up to date on ${GITHUB_REF_NAME}."
+            fi
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit --message "${TITLE}" -- pixi.lock
+          # Replace the branch: each run starts from the default branch, like Dependabot's rebases
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/heads/${BRANCH}"
+
+          if [[ -n "${open_pr}" ]]; then
+            gh pr edit "${open_pr}" --title "${TITLE}" --body-file "${RUNNER_TEMP}/diff.md"
+          else
+            gh pr create --head "${BRANCH}" --title "${TITLE}" --body-file "${RUNNER_TEMP}/diff.md"
+          fi

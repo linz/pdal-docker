@@ -1,0 +1,4 @@
+# Only the pixi manifest and lockfile are needed
+*
+!pixi.lock
+!pixi.toml

@@ -1,5 +1,7 @@
 version: 2
 updates:
+  # The pixi and ubuntu images in the Dockerfile.
+  # Dependabot can't update pixi.lock: .github/workflows/pixi-update.yml does that weekly instead.
   - package-ecosystem: docker
     directory: /
     ignore:

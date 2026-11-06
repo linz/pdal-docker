@@ -1,0 +1,26 @@
+[workspace]
+name = "pdal-docker"
+channels = ["conda-forge"]
+platforms = ["linux-64"]
+requires-pixi = ">=0.82.1"
+# Minimum package age. Exempt a package below to take an urgent fix sooner.
+exclude-newer = "2d"
+
+# Every image has Python, for the virtual environments users build on top, and tini as the init process
+[dependencies]
+python = "3.15.*" # images' users pin requires-python to this
+tini = "*"
+
+[feature.gdal.dependencies]
+libgdal-core = "3.13.*" # GDAL library and C++ programs (gdalinfo, gdalwarp, gdal_footprint, ...)
+gdal = "3.13.*" # Python bindings and scripts (gdal_edit, gdal_fillnodata)
+
+[feature.pdal.dependencies]
+libpdal-core = "2.10.*" # PDAL library and `pdal` program
+
+# One solve group, so both images share the same Python, PROJ and GDAL libraries.
+# The default environment has both for local use, e.g. `pixi run gdalinfo --version`.
+[environments]
+default = { features = ["gdal", "pdal"], solve-group = "default" }
+gdal = { features = ["gdal"], solve-group = "default" }
+pdal = { features = ["pdal"], solve-group = "default" }
